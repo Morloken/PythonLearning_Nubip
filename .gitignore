@@ -4,6 +4,7 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 Illarionov/
 Illarionov_3_11/
+Lab3/Illarionov_Mykyta_Lab3/
 # Python cache files
 __pycache__/
 *.pyc
