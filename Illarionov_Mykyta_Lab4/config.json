@@ -1,0 +1,7 @@
+{
+    "text_file": "steve_jobs.txt",
+    "target_language": "de",
+    "module_name": "mod_deeptr",
+    "output": "screen",
+    "max_sentences": 3
+}

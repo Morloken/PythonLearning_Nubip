@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+.venv/
+Illarionov_Mykyta_Lab4/
+languages_list*.txt
