@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import asyncio
 
 def main():
     try:
@@ -20,8 +21,10 @@ def main():
         print(f"Файл {txt_file} не знайдено!")
         return
 
-    if mod_name == "mod_gtrans4": from translator_pkg import mod_gtrans4 as translator_mod
-    elif mod_name == "mod_deeptr": from translator_pkg import mod_deeptr as translator_mod
+    if mod_name == "mod_gtrans4": 
+        from translator_pkg import mod_gtrans4 as translator_mod
+    elif mod_name == "mod_deeptr": 
+        from translator_pkg import mod_deeptr as translator_mod
     else:
         print("Невідомий або непідтримуваний локально модуль!")
         return
@@ -32,7 +35,11 @@ def main():
     char_count = len(text)
     sentences = [s for s in re.split(r'(?<=[.!?])\s+', text.strip()) if s]
     
-    lang_info = translator_mod.LangDetect(text, "lang")
+    # Виклик LangDetect залежно від модуля
+    if mod_name == "mod_gtrans4":
+        lang_info = asyncio.run(translator_mod.LangDetect(text, "lang"))
+    else:
+        lang_info = translator_mod.LangDetect(text, "lang")
 
     print(f"Файл: {txt_file}")
     print(f"Розмір: {file_size} байт")
@@ -42,7 +49,12 @@ def main():
     print("-" * 40)
 
     text_to_translate = " ".join(sentences[:max_sentences])
-    translated_text = translator_mod.TransLate(text_to_translate, lang_info, target_lang)
+    
+    # Виклик TransLate залежно від модуля
+    if mod_name == "mod_gtrans4":
+        translated_text = asyncio.run(translator_mod.TransLate(text_to_translate, lang_info, target_lang))
+    else:
+        translated_text = translator_mod.TransLate(text_to_translate, lang_info, target_lang)
 
     if output_type == "screen":
         print(f"Мова перекладу: {target_lang}")

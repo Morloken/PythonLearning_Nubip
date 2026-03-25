@@ -1,3 +1,4 @@
+import asyncio
 from googletrans import Translator, LANGUAGES
 
 def CodeLang(lang: str) -> str:
@@ -9,7 +10,7 @@ def CodeLang(lang: str) -> str:
             return code
     return "Помилка: мову не знайдено"
 
-def TransLate(text: str, scr: str, dest: str) -> str:
+async def TransLate(text: str, scr: str, dest: str) -> str:
     try:
         translator = Translator()
         src_code = CodeLang(scr) if scr != 'auto' else 'auto'
@@ -18,24 +19,24 @@ def TransLate(text: str, scr: str, dest: str) -> str:
         dest_code = CodeLang(dest)
         if "Помилка" in dest_code: dest_code = dest
             
-        result = translator.translate(text, src=src_code, dest=dest_code)
+        result = await translator.translate(text, src=src_code, dest=dest_code)
         return result.text
         
     except Exception as e:
         return f"Помилка перекладу: {e}"
 
-def LangDetect(text: str, set: str = "all") -> str:
+async def LangDetect(text: str, set_param: str = "all") -> str:
     try:
         translator = Translator()
-        res = translator.detect(text)
+        res = await translator.detect(text)
         
-        if set == "lang": return res.lang
-        elif set == "confidence": return str(getattr(res, 'confidence', 0.0))
+        if set_param == "lang": return res.lang
+        elif set_param == "confidence": return str(getattr(res, 'confidence', 0.0))
         else: return f"Lang: {res.lang}, Confidence: {getattr(res, 'confidence', 0.0)}"
     except Exception as e:
         return f"Помилка визначення мови: {e}"
 
-def LanguageList(out: str = "screen", text: str = "") -> str:
+async def LanguageList(out: str = "screen", text: str = "") -> str:
     try:
         header = f"{'N':<3} {'Language':<15} {'ISO-639 code':<15}"
         if text:
@@ -43,20 +44,19 @@ def LanguageList(out: str = "screen", text: str = "") -> str:
             
         output_lines = [header, "-" * 50]
         
-        # Друкуємо шапку одразу
         if out == "screen":
             print(header)
             print("-" * 50)
         
         count = 1
-        for code, name in LANGUAGES.items():
+        translator = Translator()
+        for code, name in list(LANGUAGES.items())[:20]: # Обмежив до 20, щоб Google не забанив API
             row = f"{count:<3} {name.capitalize():<15} {code:<15}"
             if text:
-                translated = TransLate(text, 'auto', code)
-                row += f" {translated}"
+                res = await translator.translate(text, src='auto', dest=code)
+                row += f" {res.text}"
             output_lines.append(row)
             
-            # Виводимо рядок по мірі його створення
             if out == "screen":
                 print(row)
                 
